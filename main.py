@@ -336,14 +336,39 @@ class MonthlyBillExcel(db.Model):
 
 # Create DB tables
 # Create DB tables and initialize menu items
-with app.app_context():
-    db.create_all()
+
 
     # insert admin data
     # admin = Admin(username='Nikhil123',password=bcrypt.generate_password_hash('Nikhil123', 10).decode('utf-8'))
     # admin = Admin(username='OMI',password=bcrypt.generate_password_hash('OMI$123', 10).decode('utf-8'))
     # db.session.add(admin)
     # db.session.commit()
+
+def ensure_admin():
+    admin_username = os.getenv("ADMIN_USERNAME")
+    admin_password = os.getenv("ADMIN_PASSWORD")
+
+    if not admin_username or not admin_password:
+        print("Admin credentials not set")
+        return
+
+    admin = Admin.query.filter_by(username=admin_username).first()
+
+    if not admin:
+        admin = Admin(
+            username=admin_username,
+            password=bcrypt.generate_password_hash(admin_password).decode("utf-8")
+        )
+        db.session.add(admin)
+        db.session.commit()
+        print("Admin created successfully")
+    else:
+        print("Admin already exists")
+
+with app.app_context():
+    db.create_all()
+    ensure_admin()
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -598,7 +623,7 @@ def userChangepassword():
 # ------------------------ ADMIN SPACE -----------------------------------
 
 # Admin login
-@app.route('/admin-login', methods=['POST', 'GET'])
+@app.route('/admin-login', methods=['POST', 'GET'])     
 def adminIndex():
     if request.method == "POST":
         username = request.form.get('username')
