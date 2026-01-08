@@ -1,0 +1,74 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Manage Slide Show{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Manage Slide Show</h2>
+    <div class="mb-3">
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="photoInput" class="form-label">Select Photos</label>
+                <input type="file" class="form-control" id="photoInput" name="photos" accept="image/*" multiple>
+            </div>
+            <div class="mb-3">
+                <label for="captionInput" class="form-label">Caption (optional)</label>
+                <input type="text" class="form-control" id="captionInput" name="caption" placeholder="Enter caption for all uploaded photos">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Photos</button>
+        </form>
+    </div>
+    <div class="row" id="photoContainer">
+        <!-- Photos will be dynamically added here -->
+    </div>
+    <a href="{{ url_for('adminDashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+    <a href="{{ url_for('public_home') }}" class="btn btn-info mt-3 ms-2">View Public Page</a>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchPhotos();
+    });
+
+    async function fetchPhotos() {
+        const response = await fetch('/api/photos');
+        const photos = await response.json();
+        const photoContainer = document.getElementById('photoContainer');
+        photoContainer.innerHTML = photos.map(photo => `
+            <div class="col-md-4 mb-3">
+                <div class="card photo-card">
+                    <img src="${photo.url}" alt="Slide Photo" class="card-img-top" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <p class="card-text">${photo.caption || 'No caption'}</p>
+                    </div>
+                    <button class="btn btn-danger btn-sm delete-btn" style="position: absolute; top: 10px; right: 10px;" onclick="deletePhoto(${photo.id})">Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function deletePhoto(id) {
+        const response = await fetch(`/api/photos/${id}`, { method: 'DELETE' });
+        if (response.ok) {
+            fetchPhotos();
+        } else {
+            alert('Error deleting photo');
+        }
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const response = await fetch('/api/photos', {
+            method: 'POST',
+            body: formData
+        });
+        if (response.ok) {
+            fetchPhotos();
+            e.target.reset();
+        } else {
+            alert('Error uploading photos');
+        }
+    });
+</script>
+{% endblock content %}

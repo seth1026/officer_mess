@@ -1,0 +1,86 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Homepage Gallery Preview{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4 fw-bold text-primary">Homepage Gallery Preview</h2>
+    <p class="text-muted mb-4">
+        These photos appear in the preview section on the homepage (latest 6 shown). 
+        They are separate from the main structured gallery.
+    </p>
+
+    <!-- Upload Form -->
+    <div class="card mb-5 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Upload Photos for Homepage Preview</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Select Photos</label>
+                    <input type="file" name="photos" class="form-control" multiple accept="image/*" required>
+                    <small class="text-muted">Hold Ctrl/Cmd to select multiple. Only the 6 latest will show on homepage.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Common Caption (optional)</label>
+                    <input type="text" name="caption" class="form-control" placeholder="e.g., Mess Dinner 2025">
+                </div>
+
+                <button type="submit" class="btn btn-success btn-lg px-5">
+                    <i class="bi bi-upload me-2"></i> Upload to Homepage Preview
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Current Photos List -->
+    <h4 class="mb-4 fw-bold text-primary">Current Preview Photos ({{ photos|length }})</h4>
+
+    {% if photos %}
+    <div class="row g-4">
+        {% for photo in photos %}
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="card h-100 shadow-sm">
+                <img src="{{ url_for('static', filename='uploads/' + photo.filename) }}"
+                     class="card-img-top"
+                     alt="{{ photo.caption or 'Preview photo' }}"
+                     style="height: 250px; object-fit: cover;">
+                <div class="card-body text-center">
+                    {% if photo.caption %}
+                    <p class="card-text small text-muted mb-2">{{ photo.caption }}</p>
+                    {% endif %}
+                    <p class="text-muted small">
+                        Uploaded: {{ photo.date_uploaded.strftime('%b %d, %Y') if photo.date_uploaded else 'N/A' }}
+                    </p>
+                    <form action="{{ url_for('delete_gallery_photo', id=photo.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Delete this photo from homepage preview?');">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 bg-light rounded-3">
+        <i class="bi bi-images fs-1 text-muted mb-3"></i>
+        <p class="fs-4 text-muted mb-0">No photos in homepage preview yet</p>
+        <p class="text-muted">Upload photos above to show them on the homepage!</p>
+    </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="text-center mt-5">
+        <a href="{{ url_for('adminDashboard') }}" class="btn btn-secondary btn-lg me-3">
+            ← Back to Dashboard
+        </a>
+        <a href="{{ url_for('public_home') }}" class="btn btn-info btn-lg">
+            View Homepage Preview
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'public/layout.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-5 fw-bold text-primary">{{ event.title }}</h1>
+    
+    <div class="row g-4">
+        <!-- Main Image -->
+        <div class="col-lg-8">
+            {% if event.detail_image %}
+            <img src="{{ url_for('static', filename='uploads/' + event.detail_image) }}" 
+                 class="img-fluid rounded-4 shadow-lg" 
+                 alt="{{ event.title }}" 
+                 style="max-height: 600px; width: 100%; object-fit: cover;">
+            {% elif event.image %}
+            <img src="{{ url_for('static', filename='uploads/' + event.image) }}" 
+                 class="img-fluid rounded-4 shadow-lg" 
+                 alt="{{ event.title }}" 
+                 style="max-height: 600px; width: 100%; object-fit: cover;">
+            {% else %}
+            <img src="{{ url_for('static', filename='uploads/placeholder.jpg') }}" 
+                 class="img-fluid rounded-4 shadow" 
+                 alt="No image" 
+                 style="max-height: 600px; width: 100%; object-fit: cover;">
+            {% endif %}
+        </div>
+
+        <!-- Event Details -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold text-primary mb-4">Event Information</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="bi bi-calendar-event text-primary me-3"></i>
+                            <strong>Date & Time:</strong><br>
+                            {{ event.date_time.strftime('%A, %d %B %Y') }} at {{ event.date_time.strftime('%I:%M %p') }}
+                        </li>
+                        <li class="mb-3">
+                            <i class="bi bi-geo-alt text-primary me-3"></i>
+                            <strong>Location:</strong><br>
+                            {{ event.location }}
+                        </li>
+                        {% if event.is_featured %}
+                        <li class="mb-3">
+                            <span class="badge bg-success">Featured Event</span>
+                        </li>
+                        {% endif %}
+                    </ul>
+
+                    <hr class="my-4">
+
+                    <h5 class="fw-bold text-primary">Description</h5>
+                    <p class="text-muted">{{ event.full_description | safe }}</p>
+
+                    <div class="mt-5">
+                        <a href="{{ url_for('events') }}" class="btn btn-outline-primary w-100 rounded-pill">
+                            ← Back to All Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

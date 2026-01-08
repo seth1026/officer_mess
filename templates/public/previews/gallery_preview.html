@@ -1,0 +1,121 @@
+<!-- Gallery Preview on Homepage -->
+<section class="gallery-section">
+    <div class="container">
+        <h2 class="gallery-title display-5 text-center mb-5">Gallery Preview</h2>
+
+        {% if preview_photos %}
+        <div class="gallery-grid">
+            {% for photo in preview_photos %}
+            <a href="{{ url_for('static', filename='uploads/' + photo.filename) }}" 
+               data-lightbox="home-gallery" 
+               data-title="{{ photo.caption or 'Mess Gallery' }}"
+               class="gallery-item">
+                <img src="{{ url_for('static', filename='uploads/' + photo.filename) }}" 
+                     alt="{{ photo.caption or 'Gallery Image' }}">
+                {% if photo.caption %}
+                <div class="gallery-overlay">
+                    <h5>{{ photo.caption }}</h5>
+                </div>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- View Full Gallery Button -->
+        <div class="text-center mt-5">
+            <a href="{{ url_for('gallery') }}" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm">
+                View Full Gallery →
+            </a>
+        </div>
+        {% else %}
+        <div class="no-images">
+            <img src="{{ url_for('static', filename='uploads/placeholder-gallery.jpg') }}" 
+                 alt="No images yet" 
+                 class="img-fluid mb-4">
+            <p class="fs-4">No gallery images available yet.</p>
+            <p class="text-muted">Check back soon for memories from the mess!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Lightbox2 CDN -->
+ <link rel="stylesheet" href="{{ url_for('static', filename='lightbox2-2.11.4\dist\css\lightbox.min.css') }}">
+ <script src="{{ url_for('static', filename='static\lightbox2-2.11.4\dist\js\lightbox.min.js') }}"></script>
+
+<script>
+lightbox.option({
+    'resizeDuration': 300,
+    'wrapAround': true,
+    'albumLabel': "Image %1 of %2"
+})
+</script>
+
+<style>
+    .gallery-section {
+        padding: 80px 20px;
+        background: #f8f9fa;
+    }
+    .gallery-title {
+        color: #001f3f;
+        font-weight: 700;
+    }
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 25px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    .gallery-item {
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 31, 63, 0.1);
+        transition: all 0.4s ease;
+    }
+    .gallery-item:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 31, 63, 0.2);
+    }
+    .gallery-item img {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        transition: transform 0.4s ease;
+    }
+    .gallery-item:hover img {
+        transform: scale(1.1);
+    }
+    .gallery-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0, 31, 63, 0.8));
+        color: white;
+        padding: 30px 20px 20px;
+        transform: translateY(20px);
+        opacity: 0;
+        transition: all 0.4s ease;
+    }
+    .gallery-item:hover .gallery-overlay {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    .gallery-overlay h5 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    .no-images {
+        text-align: center;
+        padding: 100px 20px;
+        color: #6c757d;
+    }
+    .no-images img {
+        max-width: 500px;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+</style>

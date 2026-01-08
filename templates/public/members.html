@@ -1,0 +1,74 @@
+{% extends 'public/layout.html' %}
+
+{% block content %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .member-card {
+        border-radius: 10px;
+        transition: transform 0.2s;
+    }
+    .member-card:hover {
+        transform: translateY(-5px);
+    }
+    .photo-container {
+        width: 150px;
+        height: 150px;
+        margin: 20px auto;
+        overflow: hidden;
+        border-radius: 50%;
+    }
+    .member-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+    }
+    .card-body {
+        padding: 20px;
+    }
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #343a40;
+    }
+    .card-text {
+        font-size: 1rem;
+        color: #6c757d;
+    }
+    .text-center {
+        text-align: center;
+    }
+    .mb-5 {
+        margin-bottom: 3rem;
+    }
+    .py-5 {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+    }
+    .shadow-sm {
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+</style>
+<div class="container py-5">
+    <h1 class="text-center mb-5">Our Team</h1>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for member in members %}
+            <div class="col">
+                <div class="card member-card shadow-sm h-100 text-center">
+                    <div class="photo-container">
+                        <img src="{{ member.image if member.image else '/static/images/default-member.jpg' }}" class="member-photo" alt="{{ member.name }}">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ member.name }}</h5>
+                        <p class="card-text"><strong>{{ member.role }}</strong></p>
+                        <p class="card-text">{{ member.description }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

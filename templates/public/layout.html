@@ -1,0 +1,24 @@
+<!-- templates/public/layout.html -->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMI – Mess Management System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/professional.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap-icons-1.13.1/fonts/bootstrap-icons.woff2') }}">
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+</head>
+<body>
+{% include 'public/navbar.html' %}
+
+<main class="py-4">
+{% block content %}
+    
+{% endblock content %}
+</main>
+
+</body>
+</html>

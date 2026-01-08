@@ -1,0 +1,392 @@
+{% extends 'public/layout.html' %}
+
+{% block content %}
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(135deg, #001f3f, #003366);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 60px 40px;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(0, 31, 63, 0.3);
+    }
+
+    .dashboard-header h1 {
+        font-size: 2.8rem;
+        font-weight: 700;
+    }
+
+    .dashboard-header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+
+    .action-buttons {
+        text-align: center;
+        margin: 40px 0;
+    }
+
+    .action-buttons .btn {
+        margin: 10px;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        border-radius: 50px;
+        min-width: 220px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s;
+    }
+
+    .action-buttons .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .section-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 31, 63, 0.15);
+        margin-bottom: 50px;
+        border: none;
+    }
+
+    .section-header {
+        background: linear-gradient(to right, #001f3f, #003366);
+        color: white;
+        padding: 25px 30px;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .section-header.regular {
+        background: linear-gradient(to right, #001f3f, #004080);
+    }
+
+    .section-header.event {
+        background: linear-gradient(to right, #0d47a1, #1976d2);
+    }
+
+    .section-header.party {
+        background: linear-gradient(to right, #b71c1c, #d32f2f);
+    }
+
+    .table thead {
+        background-color: #f1f3f5;
+    }
+
+    .price {
+        color: #d4af37;
+        font-weight: bold;
+    }
+
+    .badge-pending {
+        background-color: #ffc107;
+        color: #212529;
+    }
+
+    .badge-confirmed {
+        background-color: #28a745;
+    }
+
+    .badge-approved {
+        background-color: #28a745;
+    }
+
+    .no-bookings {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+        font-size: 1.2rem;
+    }
+
+    .no-bookings i {
+        font-size: 4rem;
+        opacity: 0.3;
+        margin-bottom: 20px;
+    }
+
+    .divider {
+        height: 4px;
+        background: linear-gradient(to right, transparent, #d4af37, transparent);
+        margin: 60px 0;
+        border-radius: 2px;
+    }
+</style>
+
+<div class="dashboard-container">
+    <!-- Premium Header -->
+    <div class="dashboard-header">
+        <h1 class="text-white">My Bookings</h1>
+        <p>Manage your meal and event bookings with ease</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="{{ url_for('book_regular') }}" class="btn btn-success btn-lg mx-2 mb-3">
+            <i class="bi bi-utensils me-2"></i> Book Regular Meal
+        </a>
+        <a href="{{ url_for('book_event') }}" class="btn btn-info btn-lg mx-2 mb-3">
+            <i class="bi bi-briefcase me-2"></i> Book Event Meal
+        </a>
+        <a href="{{ url_for('party_booking') }}" class="btn btn-primary btn-lg mx-2 mb-3">
+            <i class="bi bi-people me-2"></i> Book Party
+        </a>
+        <a href="{{ url_for('party_calendar') }}" class="btn btn-secondary btn-lg mx-2 mb-3">
+            <i class="bi bi-journal-text me-2"></i> View Slots
+        </a>
+    </div>
+
+    <!-- Regular Bookings -->
+    <div class="section-card">
+        <div class="section-header regular">
+            <i class="bi bi-utensils me-2"></i> Regular Meal Bookings ({{ regular_bookings.total or 0 }} total)
+        </div>
+        <div class="card-body p-4">
+            {% if regular_bookings.items %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Meal</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Booked On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in regular_bookings.items %}
+                        <tr>
+                            <td><strong>{{ b.date }}</strong></td>
+                            <td>{{ b.meal_type.capitalize() }}</td>
+                            <td>{{ b.quantity }}</td>
+                            <td class="price">₹{{ b.total | round(2) }}</td>
+                            <td>
+                                <span class="badge {{ 'badge-confirmed' if b.status == 'Confirmed' else 'badge-pending' if b.status == 'Pending' else 'bg-secondary' }}">
+                                    {{ b.status }}
+                                </span>
+                            </td>
+                            <td>{{ b.timestamp.strftime('%d %b %Y, %I:%M %p') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination for Regular Bookings -->
+            {% if regular_bookings.pages > 1 %}
+            <nav aria-label="Regular bookings pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if regular_bookings.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('user_bookings', page=regular_bookings.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in regular_bookings.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=3) %}
+                    {% if page_num %}
+                        {% if regular_bookings.page == page_num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('user_bookings', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if regular_bookings.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('user_bookings', page=regular_bookings.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="no-bookings">
+                <i class="bi bi-receipt"></i>
+                <p>No regular meal bookings yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Event Bookings -->
+    <div class="section-card">
+        <div class="section-header event">
+            <i class="bi bi-calendar-event me-2"></i> Event Meal Bookings ({{ event_bookings.total or 0 }} total)
+        </div>
+        <div class="card-body p-4">
+            {% if event_bookings.items %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Meal</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Booked On</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in event_bookings.items %}
+                        <tr>
+                            <td><strong>{{ b.date }}</strong></td>
+                            <td>{{ b.meal_type.capitalize() }}</td>
+                            <td>{{ b.quantity }}</td>
+                            <td class="price">₹{{ b.total | round(2) }}</td>
+                            <td>
+                                <span class="badge {{ 'badge-confirmed' if b.status == 'Confirmed' else 'badge-pending' if b.status == 'Pending' else 'bg-secondary' }}">
+                                    {{ b.status }}
+                                </span>
+                            </td>
+                            <td>{{ b.timestamp.strftime('%d %b %Y, %I:%M %p') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination for Event Bookings -->
+            {% if event_bookings.pages > 1 %}
+            <nav aria-label="Event bookings pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if event_bookings.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('user_bookings', page=event_bookings.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in event_bookings.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=3) %}
+                    {% if page_num %}
+                        {% if event_bookings.page == page_num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('user_bookings', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if event_bookings.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('user_bookings', page=event_bookings.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="no-bookings">
+                <i class="bi bi-calendar-x"></i>
+                <p>No event meal bookings yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Party Bookings -->
+    <div class="section-card">
+        <div class="section-header party">
+            <i class="bi bi-people-fill me-2"></i> Party & Special Event Bookings ({{ party_bookings.total or 0 }} total)
+        </div>
+        <div class="card-body p-4">
+            {% if party_bookings.items %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Occasion</th>
+                            <th>Participants</th>
+                            <th>Area</th>
+                            <th>Meal</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in party_bookings.items %}
+                        <tr>
+                            <td><strong>{{ b.date }}</strong></td>
+                            <td>{{ b.time }}</td>
+                            <td>{{ b.occasion }}</td>
+                            <td>{{ b.participants }}<br><small>(Veg: {{ b.veg_count }}, Non-Veg: {{ b.non_veg_count }})</small></td>
+                            <td>{{ b.area_selection }}</td>
+                            <td>{{ b.meal_type.capitalize() }}</td>
+                            <td class="price">₹{{ b.total | round(2) }}</td>
+                            <td>
+                                <span class="badge {{ 'badge-approved' if b.status == 'Approved' else 'badge-pending' if b.status == 'Pending' else 'bg-danger' }}">
+                                    {{ b.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination for Party Bookings -->
+            {% if party_bookings.pages > 1 %}
+            <nav aria-label="Party bookings pagination" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if party_bookings.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('user_bookings', page=party_bookings.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in party_bookings.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=3) %}
+                    {% if page_num %}
+                        {% if party_bookings.page == page_num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('user_bookings', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if party_bookings.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('user_bookings', page=party_bookings.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="no-bookings">
+                <i class="bi bi-person-x"></i>
+                <p>No party or special event bookings yet.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

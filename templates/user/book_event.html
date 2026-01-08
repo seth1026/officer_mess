@@ -1,0 +1,173 @@
+{% extends 'public/layout.html' %}
+
+{% block content %}
+<style>
+    .booking-container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+    .booking-header {
+        background: linear-gradient(135deg, #0d47a1, #1976d2);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 60px 40px;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(13, 71, 161, 0.3);
+    }
+    .booking-card {
+        background: white;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 8px 32px rgba(13, 71, 161, 0.15);
+        padding: 50px;
+    }
+    .form-label { font-weight: 600; color: #0d47a1; }
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 1.1rem;
+    }
+    .price-display {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: #1976d2;
+        text-align: center;
+        margin: 30px 0;
+        padding: 25px;
+        background: linear-gradient(to right, #f8f9fa, #e3f2fd);
+        border-radius: 15px;
+        border: 3px dashed #1976d2;
+    }
+    .btn-book {
+        background: linear-gradient(to right, #0d47a1, #1976d2);
+        border: none;
+        padding: 18px 50px;
+        font-size: 1.3rem;
+        border-radius: 50px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    .btn-book:hover {
+        background: linear-gradient(to right, #1976d2, #42a5f5);
+        transform: translateY(-5px);
+    }
+</style>
+
+<div class="booking-container">
+    <div class="booking-header">
+        <h1 class="display-5 fw-bold text-white">Book Event Meal</h1>
+        <p class="lead opacity-90 mt-3">For meetings, guests, or official events • Larger quantities</p>
+    </div>
+
+    <div class="booking-card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'warning' if category == 'warning' else 'danger' }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label for="meal_category" class="form-label">Meal Category</label>
+                    <select name="meal_category" id="meal_category" class="form-select" required>
+                        <option value="">Select Category</option>
+                        <option value="lunch">Lunch</option>
+                        <option value="dinner">Dinner</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="specific_item" class="form-label">Specific Item</label>
+                    <select name="specific_item" id="specific_item" class="form-select" required>
+                        <option value="">First select category</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="date" class="form-label">Date</label>
+                    <input type="date" name="date" id="date" class="form-control" min="{{ today_min }}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="quantity" class="form-label">Quantity (Guests)</label>
+                    <input type="number" name="quantity" id="quantity" class="form-control" min="5" value="10" required>
+                </div>
+
+                <div class="col-12">
+                    <label for="purpose" class="form-label">Purpose of Event (Optional)</label>
+                    <textarea name="purpose" id="purpose" class="form-control" rows="3" placeholder="e.g., Department meeting, Guest lunch"></textarea>
+                </div>
+            </div>
+
+            <div class="price-display" id="priceDisplay">
+                Please select category and item to see price
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-book text-white">
+                    <i class="bi bi-briefcase-fill me-2"></i> Submit Event Booking
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center mt-5">
+            <a href="{{ url_for('user_bookings') }}" class="btn btn-outline-secondary btn-lg">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+const menuOptions = {{ event_menu | tojson }};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const categorySelect = document.getElementById('meal_category');
+    const itemSelect = document.getElementById('specific_item');
+    const quantityInput = document.getElementById('quantity');
+    const priceDisplay = document.getElementById('priceDisplay');
+
+    function updateItems() {
+        const category = categorySelect.value;
+        itemSelect.innerHTML = '<option value="">Select Item</option>';
+        itemSelect.disabled = !category;
+
+        if (category && menuOptions[category]) {
+            menuOptions[category].forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.name;
+                option.textContent = item.name + ' – ₹' + item.price;
+                itemSelect.appendChild(option);
+            });
+        }
+        updatePrice();
+    }
+
+    function updatePrice() {
+        const category = categorySelect.value;
+        const itemName = itemSelect.value;
+        const qty = parseInt(quantityInput.value) || 0;
+
+        if (category && itemName && menuOptions[category]) {
+            const item = menuOptions[category].find(i => i.name === itemName);
+            if (item) {
+                const total = item.price * qty;
+                priceDisplay.innerHTML = `
+                    <strong>Price per person:</strong> ₹${item.price}<br>
+                    <strong>Total for ${qty} guests:</strong> ₹${total}
+                `;
+                return;
+            }
+        }
+        priceDisplay.innerHTML = 'Please select category and item to see price';
+    }
+
+    categorySelect.addEventListener('change', updateItems);
+    itemSelect.addEventListener('change', updatePrice);
+    quantityInput.addEventListener('input', updatePrice);
+
+    updateItems();
+});
+</script>
+{% endblock %}

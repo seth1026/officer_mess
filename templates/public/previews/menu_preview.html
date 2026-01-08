@@ -1,0 +1,92 @@
+
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .accordion {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .accordion-button {
+        background-color: #f8f9fa;
+        color: #343a40;
+        font-weight: bold;
+        font-size: 1.25rem;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        transition: background-color 0.3s;
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: #007bff;
+        color: #fff;
+    }
+    .accordion-button:focus {
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    .accordion-body {
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+    }
+    .accordion-body p {
+        margin: 0 0 10px;
+        font-size: 1rem;
+    }
+    .accordion-body img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-left: 10px;
+        vertical-align: middle;
+    }
+    .text-center {
+        text-align: center;
+    }
+    .mb-4 {
+        margin-bottom: 1.5rem;
+    }
+    .my-5 {
+        margin-top: 3rem;
+        margin-bottom: 3rem;
+    }
+</style>
+<div class="container my-5">
+    <h1 class="mb-4 text-center">This Week’s Mess Menu</h1>
+    <section id="menu" class="mb-5">
+        <div class="accordion" id="menuAccordion">
+            {% for meal_type in ['Breakfast', 'Lunch', 'Dinner'] %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button {{ 'collapsed' if loop.index > 1 }}" type="button" data-bs-toggle="collapse" data-bs-target="#{{ meal_type | lower }}">
+                            {{ '☕' if meal_type == 'Breakfast' else '🍛' if meal_type == 'Lunch' else '🍲' }} {{ meal_type }}
+                        </button>
+                    </h2>
+                    <div id="{{ meal_type | lower }}" class="accordion-collapse collapse {{ 'show' if meal_type == 'Breakfast' }}" data-bs-parent="#menuAccordion">
+                        <div class="accordion-body">
+                            {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                            {% for day in days %}
+                                {% set items = menu_items | selectattr('meal_type', 'equalto', meal_type) | selectattr('day', 'equalto', day) | list %}
+                                {% if items %}
+                                    {% for item in items %}
+                                        <p><strong>{{ day }}:</strong> {{ item.description }}
+                                            {% if item.image %}
+                                                <img src="{{ item.image }}" alt="{{ meal_type }} for {{ day }}">
+                                            {% endif %}
+                                        </p>
+                                    {% endfor %}
+                                {% else %}
+                                    <p><strong>{{ day }}:</strong> No items available.</p>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>

@@ -1,0 +1,77 @@
+{% extends 'public/layout.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Page Title - Use event_name if available -->
+    <h1 class="text-center mb-3 fw-bold text-primary display-5">
+        {% if photos and photos[0].event_name %}
+        {{ photos[0].event_name }}
+        {% elif category == 'all' %}
+        All Photos {{ year }}
+        {% else %}
+        {{ category.capitalize() }} {{ year }}
+        {% endif %}
+    </h1>
+    <p class="text-center text-muted mb-5">{{ photos|length }} memorable moments</p>
+
+    <!-- Photo Grid -->
+    {% if photos %}
+    <div class="row g-4 justify-content-center">
+        {% for photo in photos %}
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <a href="{{ url_for('static', filename='uploads/' + photo.filename) }}" 
+               data-lightbox="gallery-{{ year }}"
+               data-title="{{ photo.caption or photos[0].event_name or 'Mess Gallery' }}"
+               class="d-block hover-lift">
+                <img src="{{ url_for('static', filename='uploads/' + photo.filename) }}"
+                     class="img-fluid rounded-4 shadow"
+                     alt="{{ photo.caption or 'Gallery photo' }}"
+                     loading="lazy"
+                     style="height: 320px; object-fit: cover; width: 100%;">
+            </a>
+            {% if photo.caption %}
+            <p class="text-center text-muted small mt-2 fw-medium">{{ photo.caption }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 bg-light rounded-3">
+        <i class="bi bi-images fs-1 text-muted mb-3"></i>
+        <p class="fs-4 text-muted mb-0">No photos found for this selection</p>
+        <p class="text-muted">Check back soon!</p>
+    </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="text-center mt-5">
+        <a href="{{ url_for('gallery') }}" class="btn btn-outline-primary btn-lg rounded-pill px-5 shadow-sm">
+            ← Back to Gallery
+        </a>
+    </div>
+</div>
+
+<!-- Lightbox2 - Fixed Paths -->
+<link rel="stylesheet" href="{{ url_for('static', filename='lightbox2/css/lightbox.min.css') }}">
+<script src="{{ url_for('static', filename='lightbox2/js/lightbox.min.js') }}"></script>
+
+<script>
+lightbox.option({
+    'resizeDuration': 300,
+    'wrapAround': true,
+    'albumLabel': "Image %1 of %2",
+    'alwaysShowNavOnTouchDevices': true,
+    'disableScrolling': true
+});
+</script>
+
+<style>
+    .hover-lift {
+        transition: all 0.3s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 25px 50px rgba(0, 31, 63, 0.2);
+    }
+</style>
+{% endblock %}

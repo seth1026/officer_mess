@@ -1,0 +1,169 @@
+{% extends 'public/layout.html' %}
+
+{% block content %}
+<style>
+    .menu-container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+    .menu-header { background: linear-gradient(135deg, #001f3f, #003366); color: white; border-radius: 15px 15px 0 0; padding: 50px; text-align: center; }
+    .section-table { background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-radius: 0 0 15px 15px; overflow: hidden; margin-bottom: 60px; }
+    .table thead { background-color: #001f3f; color: white; }
+    .table th, .table td { vertical-align: middle; }
+    .price-col { font-weight: bold; color: #d4af37; text-align: right; font-size: 1.1rem; }
+    .day-col { font-weight: bold; color: #001f3f; width: 150px; }
+    .item-col { font-size: 1.1rem; }
+    .divider { height: 4px; background: linear-gradient(to right, transparent, #d4af37, transparent); margin: 60px 0; }
+    h2 { color: #001f3f; }
+    .icon { color: #d4af37; }
+    @media (max-width: 768px) {
+        .table-responsive { font-size: 0.95rem; }
+        .price-col { text-align: left; }
+    }
+</style>
+
+<div class="menu-container">
+    <!-- Elegant Header -->
+    <div class="menu-header">
+        <h1 class="text-white display-4 fw-bold">Officer Mess and Institute Mess Menu</h1>
+        <p class="lead opacity-90 mt-3">Quality dining experience • Updated as of December 2025</p>
+    </div>
+
+    <!-- Breakfast Table -->
+    <div class="section-table">
+        <div class="p-4 bg-light">
+            <h2 class="mb-4"><i class="bi bi-sunrise-fill icon me-2"></i> Breakfast</h2>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th class="day-col">Day</th>
+                            <th class="item-col">Items</th>
+                            <th class="price-col">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in menu_data.breakfast %}
+                        <tr>
+                            <td class="day-col">{{ item.day }}</td>
+                            <td class="item-col">{{ item.item_name }}</td>
+                            <td class="price-col">₹{{ item.price | round(0) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Lunch Table -->
+    <div class="section-table">
+        <div class="p-4 bg-light">
+            <h2 class="mb-4"><i class="bi bi-brightness-high-fill icon me-2"></i> Lunch Options</h2>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th class="item-col">Item</th>
+                            <th class="price-col">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in menu_data.lunch %}
+                        <tr>
+                            <td class="item-col">{{ item.item_name }}</td>
+                            <td class="price-col">₹{{ item.price | round(0) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Dinner Table -->
+    <div class="section-table">
+        <div class="p-4 bg-light">
+            <h2 class="mb-4"><i class="bi bi-moon-stars-fill icon me-2"></i> Dinner Options</h2>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th class="item-col">Item</th>
+                            <th class="price-col">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in menu_data.dinner %}
+                        <tr>
+                            <td class="item-col">{{ item.item_name }}</td>
+                            <td class="price-col">₹{{ item.price | round(0) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Beverages Table -->
+    <div class="section-table">
+        <div class="p-4 bg-light">
+            <h2 class="mb-4"><i class="bi bi-cup-hot-fill icon me-2"></i> Tea & Coffee</h2>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th class="item-col">Beverage</th>
+                            <th class="price-col">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in menu_data.beverages %}
+                        <tr>
+                            <td class="item-col">{{ item.item_name }}</td>
+                            <td class="price-col">₹{{ item.price | round(0) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Leisure Lounge Table -->
+    <div class="section-table">
+        <div class="p-4 bg-light">
+            <h2 class="mb-4"><i class="bi bi-cup-straw icon me-2"></i> Leisure Lounge Specials</h2>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th class="item-col">Item</th>
+                            <th class="price-col">Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in menu_data.leisure %}
+                        <tr>
+                            <td class="item-col">{{ item.item_name }}</td>
+                            <td class="price-col">₹{{ item.price | round(0) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="text-center mt-5 pb-5">
+        <p class="text-muted fst-italic">Menu items are subject to availability and change. For special dietary requirements, please inform in advance.</p>
+    </div>
+</div>
+{% endblock %}

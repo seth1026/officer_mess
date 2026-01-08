@@ -1,0 +1,128 @@
+<!-- Ongoing Sessions -->
+<section id="sessions" class="container my-5">
+  <style>
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .class-card {
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+      overflow: hidden;
+    }
+
+    .class-card:hover {
+      transform: translateY(-5px);
+    }
+
+    /* Image container with subtle background */
+    .class-img-wrapper {
+      width: 100%;
+      height: 200px;
+      /* Increased a bit for better presence */
+      background-color: #f1f3f5;
+      /* Soft light gray - hides white edges */
+      overflow: hidden;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+
+    .class-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      /* Fills the space completely, no side gaps */
+      transition: transform 0.4s ease;
+    }
+
+    .class-card:hover .class-img {
+      transform: scale(1.08);
+      /* Gentle zoom on hover */
+    }
+
+    .card-body {
+      padding: 25px;
+      /* More breathing room */
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      /* Slightly larger */
+      font-weight: bold;
+      color: #343a40;
+    }
+
+    .card-text {
+      font-size: 1.05rem;
+      color: #6c757d;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .mb-4 {
+      margin-bottom: 1.5rem;
+    }
+
+    .my-5 {
+      margin-top: 3rem;
+      margin-bottom: 3rem;
+    }
+  </style>
+
+  <h2 class="text-center mb-5 fw-bold" style="color: #001f3f;">Currently Active Sessions</h2>
+
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for session in sessions %}
+    <div class="col">
+      <div class="card class-card mb-3 h-100">
+        {% if session.image %}
+        <div class="class-img-wrapper">
+          <img src="{{ session.image }}" class="class-img" alt="{{ session.name }}">
+        </div>
+        {% else %}
+        <div class="class-img-wrapper d-flex align-items-center justify-content-center bg-light">
+          <img src="{{ url_for('static', filename='uploads/placeholder.jpg') }}" class="class-img"
+            alt="No image available">
+        </div>
+        {% endif %}
+        <div class="card-body text-center">
+          <h5 class="card-title">{{ session.name }}</h5>
+          <p class="card-text">{{ session.schedule }}</p>
+
+          <!-- NEW: Instructor & Contact -->
+          {% if session.instructor_name %}
+          <p class="mb-2">
+            <strong>Instructor:</strong> {{ session.instructor_name }}
+          </p>
+          {% endif %}
+          {% if session.contact_details %}
+          <p class="mb-2">
+            <strong>Contact:</strong> {{ session.contact_details }}
+          </p>
+          {% endif %}
+
+          <!-- NEW: Course Fee -->
+          <p class="mb-3 fw-bold text-primary fs-5">
+            {% if session.course_fee %}
+            Course Fee: ₹{{ session.course_fee }}
+            {% else %}
+            Free Session
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if not sessions %}
+  <div class="text-center py-5">
+    <p class="text-muted fs-4">No active sessions at this time.</p>
+  </div>
+  {% endif %}
+</section>

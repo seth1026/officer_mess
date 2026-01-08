@@ -1,0 +1,155 @@
+<!-- ========================= -->
+<!-- Featured Events Section -->
+<!-- ========================= -->
+<section class="py-5" style="background-color: #F5F7FA;">
+    <div class="container">
+
+        <h2 class="text-center mb-5 fw-semibold" style="color:#0B1F3A;">
+            Featured Events
+        </h2>
+
+        <!-- CHANGE 1: Use featured_events directly -->
+        {% if featured_events %}
+        <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
+
+            <div class="carousel-inner rounded-3 overflow-hidden border bg-white">
+
+                {% for event in featured_events %}
+                <div class="carousel-item {{ 'active' if loop.first else '' }}">
+                    <div class="row g-0 align-items-center">
+
+                        <!-- Image -->
+                        <div class="col-lg-6">
+                            <img src="{{ url_for('static', filename='uploads/' + (event.detail_image or event.image or 'placeholder.jpg')) }}"
+                                 class="w-100"
+                                 alt="{{ event.title }}"
+                                 style="height: 420px; object-fit: fill;">
+                        </div>
+
+                        <!-- Content -->
+                        <div class="col-lg-6 p-5">
+                            <h4 class="fw-bold mb-3" style="color:#0B1F3A;">
+                                {{ event.title }}
+                            </h4>
+
+                            <p class="text-muted mb-4">
+                                {{ event.short_description }}
+                            </p>
+
+                            <ul class="list-unstyled small mb-4 text-muted">
+                                <li class="mb-2">
+                                    <i class="bi bi-calendar-event me-2"></i>
+                                    {{ event.date_time.strftime('%A, %d %B %Y • %I:%M %p') }}
+                                </li>
+                                <li>
+                                    <i class="bi bi-geo-alt me-2"></i>
+                                    {{ event.location }}
+                                </li>
+                            </ul>
+
+                            <a href="{{ url_for('event_detail', id=event.id) }}"
+                               class="btn btn-outline-primary rounded-pill px-4">
+                                View Details
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+
+            <!-- Carousel Controls (only if more than one) -->
+            {% if featured_events | length > 1 %}
+            <button class="carousel-control-prev" type="button"
+                    data-bs-target="#featuredCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+
+            <button class="carousel-control-next" type="button"
+                    data-bs-target="#featuredCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+            {% endif %}
+
+        </div>
+        {% else %}
+        <p class="text-center text-muted fs-5">
+            No featured events at this time.
+        </p>
+        {% endif %}
+
+    </div>
+</section>
+
+<!-- ========================= -->
+<!-- All Upcoming Events -->
+<!-- ========================= -->
+<section class="container my-5">
+
+    <h2 class="text-center mb-5 fw-semibold" style="color:#0B1F3A;">
+        All Upcoming Events
+    </h2>
+
+    <!-- CHANGE 2: Use upcoming_events directly -->
+    {% if upcoming_events %}
+    <div class="row g-4">
+
+        {% for event in upcoming_events %}
+        <div class="col-md-6 col-lg-4">
+
+            <div class="card h-100 border shadow-sm rounded-3">
+
+                {% if event.image %}
+                <img src="{{ url_for('static', filename='uploads/' + event.image) }}"
+                     class="card-img-top"
+                     alt="{{ event.title }}"
+                     style="height: 220px; object-fit: cover;">
+                {% endif %}
+
+                <div class="card-body p-4 d-flex flex-column">
+
+                    <h6 class="fw-bold mb-2" style="color:#0B1F3A;">
+                        {{ event.title }}
+                    </h6>
+
+                    <p class="text-muted small mb-3">
+                        {{ event.short_description }}
+                    </p>
+
+                    <div class="small text-muted mb-3">
+                        <div>
+                            <i class="bi bi-calendar-event me-2"></i>
+                            {{ event.date_time.strftime('%d %b %Y • %I:%M %p') }}
+                        </div>
+                        <div>
+                            <i class="bi bi-geo-alt me-2"></i>
+                            {{ event.location }}
+                        </div>
+                    </div>
+
+                    {% if event.show_in_featured %}
+                    <span class="badge mb-3" style="background:#B89B5E;color:#fff;">
+                        Featured
+                    </span>
+                    {% endif %}
+
+                    <a href="{{ url_for('event_detail', id=event.id) }}"
+                       class="btn btn-outline-primary btn-sm w-100 rounded-pill mt-auto">
+                        View Details
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+    {% else %}
+    <p class="text-center text-muted fs-5">
+        No events scheduled at this time.
+    </p>
+    {% endif %}
+
+</section>

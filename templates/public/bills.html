@@ -1,0 +1,96 @@
+{% extends 'public/layout.html' %}
+
+{% block content %}
+<div class="container my-5">
+
+    <h2 class="text-center mb-5 fw-bold text-dark display-5">
+        My Mess Bills
+    </h2>
+
+    <div class="alert alert-light border rounded-4 shadow-sm mb-5 bg-white">
+        <i class="bi bi-info-circle me-2 text-primary"></i>
+        <strong>Note:</strong> Monthly mess bills are prepared manually and shared via Excel format.
+        Click on a year below to view and download individual monthly bills.
+    </div>
+
+    {% if years %}
+    <div class="row g-5 justify-content-center">
+        {% for year in years %}
+        <div class="col-md-6 col-lg-4">
+
+            <a href="{{ url_for('view_year_bills', year=year) }}" class="text-decoration-none">
+                <div class="card year-card h-100 text-center">
+
+                    <!-- Accent strip -->
+                    <div class="year-strip"></div>
+
+                    <div class="card-body p-5 d-flex flex-column justify-content-center">
+                        <h3 class="display-5 fw-bold text-primary mb-2">
+                            {{ year }}
+                        </h3>
+
+                        <p class="text-muted mb-4">
+                            Mess Bills
+                        </p>
+
+                        <div class="mt-auto">
+                            <i class="bi bi-folder2-open fs-1 text-primary opacity-75 mb-2"></i>
+                            <p class="mb-0 text-secondary">
+                                View Monthly Bills
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </a>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="text-center py-5">
+        <div class="alert alert-light rounded-4 shadow-sm d-inline-block px-5 bg-white">
+            <i class="bi bi-exclamation-triangle fs-1 text-warning mb-3"></i>
+            <p class="fs-4 mb-0">No bill records available yet.</p>
+            <p class="text-muted">Please check back later or contact the mess administrator.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    :root {
+        --blue-main: #2f5f8f;
+        --blue-soft: #eaf1f8;
+        --blue-border: #d6e2f0;
+        --shadow-soft: rgba(47, 95, 143, 0.15);
+    }
+
+    .year-card {
+        background: var(--blue-soft);
+        border: 1px solid var(--blue-border);
+        border-radius: 18px;
+        box-shadow: 0 12px 30px var(--shadow-soft);
+        transition: all 0.35s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .year-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 22px 45px rgba(47, 95, 143, 0.25);
+    }
+
+    .year-strip {
+        height: 6px;
+        width: 100%;
+        background: linear-gradient(
+            to right,
+            #8fb7dd,
+            #5c8ec7,
+            #8fb7dd
+        );
+    }
+</style>
+{% endblock %}

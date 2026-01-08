@@ -1,0 +1,67 @@
+{% extends 'public/layout.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Page Header -->
+    <div class="text-center mb-5">
+        <h1 class="display-5 fw-bold text-primary">{{ year }} Mess Bills</h1>
+        <p class="lead text-muted">Download your monthly Excel bill sheets</p>
+    </div>
+
+    <!-- Monthly Bills Grid -->
+    <div class="row g-4">
+        {% for item in bills_data %}
+        <div class="col-md-6 col-lg-4 col-xl-3">
+            <div class="card h-100 text-center shadow-sm border-0 rounded-4 hover-lift">
+                <div class="card-body p-4 d-flex flex-column">
+                    <!-- Month Name -->
+                    <h5 class="fw-bold text-primary mb-4">{{ item.month_name }}</h5>
+
+                    {% if item.bill %}
+                    <!-- Bill Available -->
+                    <div class="text-success mb-3">
+                        <i class="bi bi-check-circle-fill fs-3"></i>
+                        <p class="mt-2 mb-0 fw-medium">Available</p>
+                    </div>
+                    <p class="text-muted small mb-4">
+                        Uploaded on {{ item.bill.upload_date.strftime('%b %d, %Y') }}
+                    </p>
+                    <a href="{{ url_for('download_bill', filename=item.bill.filename) }}"
+                       class="btn btn-primary rounded-pill mt-auto shadow-sm px-5">
+                        <i class="bi bi-download me-2"></i> Download Excel
+                    </a>
+                    {% else %}
+                    <!-- Bill Not Available -->
+                    <div class="text-muted mb-4">
+                        <i class="bi bi-clock fs-3"></i>
+                        <p class="mt-2 mb-0">Not uploaded yet</p>
+                    </div>
+                    <button class="btn btn-outline-secondary rounded-pill mt-auto px-5" disabled>
+                        Coming Soon
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Back Button -->
+    <div class="text-center mt-5">
+        <a href="{{ url_for('bills') }}" class="btn btn-outline-primary btn-lg rounded-pill px-5 shadow-sm">
+            ← Back to All Years
+        </a>
+    </div>
+</div>
+
+<!-- Hover Effect Style -->
+<style>
+    .hover-lift {
+        transition: all 0.3s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 31, 63, 0.15);
+    }
+</style>
+{% endblock %}

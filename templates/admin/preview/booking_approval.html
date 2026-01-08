@@ -1,0 +1,299 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Admin: All Bookings{% endblock %}
+
+{% block content %}
+<div class="container content my-5">
+    <div class="section-header mb-4">
+        <h2 class="fw-bold text-primary">Admin: All Bookings</h2>
+        <p class="text-muted">Manage and approve user bookings</p>
+    </div>
+    
+    <div class="mb-4 text-center">
+        <a href="{{ url_for('admin_party_calendar') }}" class="btn btn-primary me-2">View Booked Party Slots</a>
+        <a href="{{ url_for('admin_menu') }}" class="btn btn-secondary">Manage Menu</a>
+    </div>
+
+    <!-- Regular Bookings -->
+    <div class="card mb-5">
+        <div class="card-header bg-info text-white">
+            <h5 class="card-title mb-0">Regular Bookings ({{ regular_bookings.total or 0 }} total)</h5>
+        </div>
+        <div class="card-body">
+            {% if regular_bookings.items %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Meal Type</th>
+                            <th>Quantity</th>
+                            <th>Total (₹)</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking, username in regular_bookings.items %}
+                        <tr>
+                            <td>{{ booking.id }}</td>
+                            <td>{{ username }}</td>
+                            <td>{{ booking.meal_type | capitalize }}</td>
+                            <td>{{ booking.quantity }}</td>
+                            <td>{{ booking.total | round(2) }}</td>
+                            <td>{{ booking.date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination for Regular -->
+            {% if regular_bookings.pages > 1 %}
+            <nav aria-label="Regular bookings pagination">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if regular_bookings.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_bookings', page=regular_bookings.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in regular_bookings.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=3) %}
+                    {% if page_num %}
+                        {% if regular_bookings.page == page_num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('admin_bookings', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if regular_bookings.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_bookings', page=regular_bookings.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <p class="text-muted text-center py-3">No regular bookings found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Event Bookings -->
+    <div class="card mb-5">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="card-title mb-0">Event Bookings ({{ event_bookings.total or 0 }} total)</h5>
+        </div>
+        <div class="card-body">
+            {% if event_bookings.items %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Meal Type</th>
+                            <th>Quantity</th>
+                            <th>Total (₹)</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                            <th>Created At</th>
+                            <th>Updated At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking, username in event_bookings.items %}
+                        <tr>
+                            <td>{{ booking.id }}</td>
+                            <td>{{ username }}</td>
+                            <td>{{ booking.meal_type | capitalize }}</td>
+                            <td>{{ booking.quantity }}</td>
+                            <td>{{ booking.total | round(2) }}</td>
+                            <td>{{ booking.date }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if booking.status == 'Approved' else 'warning' if booking.status == 'Pending' else 'danger' }}">
+                                    {{ booking.status }}
+                                </span>
+                            </td>
+                            <td>{{ booking.remarks or 'None' }}</td>
+                            <td>{{ booking.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ booking.updated_at.strftime('%Y-%m-%d %H:%M') if booking.updated_at else 'N/A' }}</td>
+                            <td>
+                                <form action="{{ url_for('update_regular_event_booking_status', booking_id=booking.id) }}" method="POST" class="d-inline">
+                                    <select name="status" class="form-select form-select-sm d-inline w-auto">
+                                        <option value="Pending" {{ 'selected' if booking.status == 'Pending' }}>Pending</option>
+                                        <option value="Approved" {{ 'selected' if booking.status == 'Approved' }}>Approved</option>
+                                        <option value="Rejected" {{ 'selected' if booking.status == 'Rejected' }}>Rejected</option>
+                                    </select>
+                                    <input type="text" name="remarks" class="form-control form-control-sm d-inline w-auto mt-1" placeholder="Remarks" value="{{ booking.remarks or '' }}">
+                                    <button type="submit" class="btn btn-primary btn-sm mt-1">Update</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination for Event -->
+            {% if event_bookings.pages > 1 %}
+            <nav aria-label="Event bookings pagination">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if event_bookings.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_bookings', page=event_bookings.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in event_bookings.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=3) %}
+                    {% if page_num %}
+                        {% if event_bookings.page == page_num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('admin_bookings', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if event_bookings.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_bookings', page=event_bookings.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <p class="text-muted text-center py-3">No event bookings found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Party Bookings -->
+    <div class="card mb-5">
+        <div class="card-header bg-danger text-white">
+            <h5 class="card-title mb-0">Party Bookings ({{ party_bookings.total or 0 }} total)</h5>
+        </div>
+        <div class="card-body">
+            {% if party_bookings.items %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Nature</th>
+                            <th>Occasion</th>
+                            <th>Participants</th>
+                            <th>Veg</th>
+                            <th>Non-Veg</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Meal</th>
+                            <th>Area</th>
+                            <th>Mobile</th>
+                            <th>Total (₹)</th>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                            <th>Created</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking, username in party_bookings.items %}
+                        <tr>
+                            <td>{{ booking.id }}</td>
+                            <td>{{ username }}</td>
+                            <td>{{ booking.nature }}</td>
+                            <td>{{ booking.occasion }}</td>
+                            <td>{{ booking.participants }}</td>
+                            <td>{{ booking.veg_count }}</td>
+                            <td>{{ booking.non_veg_count }}</td>
+                            <td>{{ booking.date }}</td>
+                            <td>{{ booking.time }}</td>
+                            <td>{{ booking.meal_type | capitalize }}</td>
+                            <td>{{ booking.area_selection }}</td>
+                            <td>{{ booking.mobile }}</td>
+                            <td>{{ booking.total | round(2) }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if booking.status == 'Approved' else 'warning' if booking.status == 'Pending' else 'danger' }}">
+                                    {{ booking.status }}
+                                </span>
+                            </td>
+                            <td>{{ booking.remarks or 'None' }}</td>
+                            <td>{{ booking.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <form action="{{ url_for('update_party_booking_status', booking_id=booking.id) }}" method="POST" class="d-inline">
+                                    <select name="status" class="form-select form-select-sm d-inline w-auto">
+                                        <option value="Pending" {{ 'selected' if booking.status == 'Pending' }}>Pending</option>
+                                        <option value="Approved" {{ 'selected' if booking.status == 'Approved' }}>Approved</option>
+                                        <option value="Rejected" {{ 'selected' if booking.status == 'Rejected' }}>Rejected</option>
+                                    </select>
+                                    <input type="text" name="remarks" class="form-control form-control-sm d-inline w-auto mt-1" placeholder="Remarks" value="{{ booking.remarks or '' }}">
+                                    <button type="submit" class="btn btn-primary btn-sm mt-1">Update</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination for Party -->
+            {% if party_bookings.pages > 1 %}
+            <nav aria-label="Party bookings pagination">
+                <ul class="pagination justify-content-center mt-4">
+                    {% if party_bookings.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_bookings', page=party_bookings.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in party_bookings.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=3) %}
+                    {% if page_num %}
+                        {% if party_bookings.page == page_num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('admin_bookings', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if party_bookings.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin_bookings', page=party_bookings.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <p class="text-muted text-center py-3">No party bookings found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

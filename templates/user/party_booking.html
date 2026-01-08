@@ -1,0 +1,194 @@
+{% extends 'public/layout.html' %}
+
+{% block content %}
+<style>
+    .booking-container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+    .booking-header {
+        background: linear-gradient(135deg, #001f3f, #003366);
+        color: white;
+        border-radius: 15px 15px 0 0;
+        padding: 60px 40px;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(0, 31, 63, 0.3);
+    }
+    .booking-card {
+        background: white;
+        border-radius: 0 0 15px 15px;
+        box-shadow: 0 8px 32px rgba(0, 31, 63, 0.15);
+        padding: 50px;
+    }
+    .form-label { font-weight: 600; color: #001f3f; }
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-size: 1.1rem;
+    }
+    .price-display {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: #d4af37;
+        text-align: center;
+        margin: 30px 0;
+        padding: 25px;
+        background: linear-gradient(to right, #f8f9fa, #e9ecef);
+        border-radius: 15px;
+        border: 3px dashed #d4af37;
+    }
+    .btn-book {
+        background: linear-gradient(to right, #b71c1c, #d32f2f);
+        border: none;
+        padding: 18px 50px;
+        font-size: 1.3rem;
+        border-radius: 50px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    .btn-book:hover {
+        background: linear-gradient(to right, #d32f2f, #f44336);
+        transform: translateY(-5px);
+    }
+</style>
+
+<div class="booking-container">
+    <div class="booking-header">
+        <h1 class="display-5 fw-bold text-white">Book Party / Special Event</h1>
+        <p class="lead opacity-90 mt-3">Plan your gathering with our premium catering services</p>
+    </div>
+
+    <div class="booking-card">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'warning' if category == 'warning' else 'danger' }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label for="nature" class="form-label">Nature of Party</label>
+                    <select name="nature" id="nature" class="form-select" required>
+                        <option value="">Select Nature</option>
+                        <option value="Official">Official</option>
+                        <option value="Unofficial">Unofficial</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="occasion" class="form-label">Occasion</label>
+                    <input type="text" name="occasion" id="occasion" class="form-control" placeholder="e.g., Birthday, Farewell" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="participants" class="form-label">Total Participants</label>
+                    <input type="number" name="participants" id="participants" class="form-control" min="5" value="10" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="veg_count" class="form-label">Veg Count</label>
+                    <input type="number" name="veg_count" id="veg_count" class="form-control" min="0" value="5" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="non_veg_count" class="form-label">Non-Veg Count</label>
+                    <input type="number" name="non_veg_count" id="non_veg_count" class="form-control" min="0" value="5" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="date" class="form-label">Date</label>
+                    <input type="date" name="date" id="date" class="form-control" min="{{ today_min }}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="time" class="form-label">Time</label>
+                    <input type="time" name="time" id="time" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="area_selection" class="form-label">Venue Area</label>
+                    <select name="area_selection" id="area_selection" class="form-select" required>
+                        <option value="">Select Area</option>
+                        <option value="Bar Room">Bar Room</option>
+                        <option value="Lawn Area">Lawn Area</option>
+                        <option value="Function Hall">Function Hall</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="meal_type" class="form-label">Meal Type</label>
+                    <select name="meal_type" id="meal_type" class="form-select" required>
+                        <option value="">Select Meal</option>
+                        <option value="lunch">Lunch</option>
+                        <option value="dinner">Dinner</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label for="menu_items" class="form-label">Menu Items (comma separated)</label>
+                    <textarea name="menu_items" id="menu_items" class="form-control" rows="4" 
+                              placeholder="e.g., Chicken Biryani, Paneer Butter Masala, Naan, Gulab Jamun" required></textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="telephone" class="form-label">Telephone</label>
+                    <input type="tel" name="telephone" id="telephone" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="mobile" class="form-label">Mobile</label>
+                    <input type="tel" name="mobile" id="mobile" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="price-display" id="priceDisplay">
+                Estimated total will appear here after selecting meal type and participants
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-book text-white">
+                    <i class="bi bi-calendar-event-fill me-2"></i> Submit Party Booking
+                </button>
+            </div>
+        </form>
+
+        <div class="text-center mt-5">
+            <a href="{{ url_for('user_bookings') }}" class="btn btn-outline-secondary btn-lg">
+                ← Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+const partyPrices = {{ party_prices | tojson }};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const mealType = document.getElementById('meal_type');
+    const participants = document.getElementById('participants');
+    const priceDisplay = document.getElementById('priceDisplay');
+
+    function updateTotal() {
+        const meal = mealType.value;
+        const count = parseInt(participants.value) || 0;
+
+        if (meal && count > 0 && partyPrices[meal]) {
+            const pricePer = partyPrices[meal];
+            const total = pricePer * count;
+            priceDisplay.innerHTML = `
+                <strong>Base price per person:</strong> ₹${pricePer}<br>
+                <strong>Estimated total for ${count} guests:</strong> ₹${total}
+                <br><small>Note: Final amount may vary based on menu</small>
+            `;
+        } else {
+            priceDisplay.innerHTML = 'Estimated total will appear here after selecting meal type and participants';
+        }
+    }
+
+    mealType.addEventListener('change', updateTotal);
+    participants.addEventListener('input', updateTotal);
+});
+</script>
+{% endblock %}

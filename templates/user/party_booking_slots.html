@@ -1,0 +1,62 @@
+{% extends 'user/base.html' %}
+
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">All Party Booking Slots</h2>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% if bookings %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Meal Type</th>
+                    <th>Participants</th>
+                    <th>Nature</th>
+                    <th>Occasion</th>
+                    <th>Area Selection</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking, username in bookings %}
+                <tr>
+                    <td>{{ username }}</td>
+                    <td>{{ booking.date }}</td>
+                    <td>{{ booking.time }}</td>
+                    <td>{{ booking.meal_type | capitalize }}</td>
+                    <td>{{ booking.participants }}</td>
+                    <td>{{ booking.nature }}</td>
+                    <td>{{ booking.occasion }}</td>
+                    <td>{{ booking.area_selection }}</td>
+                    <td>${{ booking.total | round(2) }}</td>
+                    <td>{{ booking.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p>No party booking slots found.</p>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('user_bookings') }}" class="btn btn-secondary">Back to Bookings</a>
+    </div>
+</div>
+{% endblock %}

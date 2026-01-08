@@ -1,0 +1,66 @@
+{% block content %}
+<!-- Professional Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light sticky-top">
+    <div class="container">
+        <!-- Logo and App Name -->
+        <a class="navbar-brand me-auto" href="/">
+            <!-- <img src="{{ url_for('static', filename='images/mess_logo.jpg') }}" alt="Mess Logo"> -->
+            <span class="ms-2 d-none d-md-inline">OMI – Sadbhavana</span>
+        </a>
+
+        <!-- Toggle button for mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navigation links -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item"><a class="nav-link" href="/home">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/members">Members</a></li>
+                <li class="nav-item"><a class="nav-link" href="/menu">Menu</a></li>
+                <li class="nav-item"><a class="nav-link" href="/booking">Booking</a></li>
+                <li class="nav-item"><a class="nav-link" href="/gallery">Gallery</a></li>
+                <li class="nav-item"><a class="nav-link" href="/events">Events</a></li>
+                <li class="nav-item"><a class="nav-link" href="/bills">Bills</a></li>
+                {% if logged_in_user %}
+                    <li class="nav-item">
+                        <span class="nav-link disabled text-muted">Welcome, {{ logged_in_user }}</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">Login</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script>
+    // Add shadow on scroll
+    window.addEventListener('scroll', function() {
+        const navbar = document.querySelector('.navbar');
+        if (window.scrollY > 10) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // Set active nav link based on current page
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPath || 
+                (currentPath === '/' && link.getAttribute('href') === '/home')) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
+{% endblock content %}

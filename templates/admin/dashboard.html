@@ -1,0 +1,143 @@
+{% extends 'admin/layout.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="container content">
+    <div class="section-header mb-4">
+        <h1>Admin Dashboard</h1>
+        <p class="text-muted">Manage the OMI Mess Management System</p>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">System Overview</h5>
+            <p class="card-text mb-0"><strong>Total Users:</strong> <span class="badge bg-primary">{{ user_count }}</span></p>
+        </div>
+    </div>
+    <section id="public-pages" class="mb-5">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Manage Users</h5>
+                        <p class="card-text">Add, edit, or delete user accounts.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('manage_users') }}" class="btn btn-primary btn-sm">Go to Users</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Slide Show</h5>
+                        <p class="card-text">Manage photos for the public page slideshow.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('edit_slideshow') }}" class="btn btn-primary btn-sm">Manage</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Events</h5>
+                        <p class="card-text">Add, edit, or delete events for the public page.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('manage_events') }}" class="btn btn-primary btn-sm">Manage</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Gallery</h5>
+                        <p class="card-text">Add or delete photos for the public gallery page.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('edit_gallery') }}" class="btn btn-primary btn-sm">Manage</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Members</h5>
+                        <p class="card-text">Add, edit, or delete team members.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('edit_members') }}" class="btn btn-primary btn-sm">Manage</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Manage Sessions</h5>
+                        <p class="card-text">Add, edit, or delete active sessions.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('edit_sessions') }}" class="btn btn-primary btn-sm">Manage</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Booking approval</h5>
+                        <p class="card-text">Approve the users bookings.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('admin_bookings') }}" class="btn btn-primary btn-sm">Manage</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Manage bills</h5>
+                        <p class="card-text">Add or delete bills</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('admin_upload_bill') }}" class="btn btn-primary btn-sm">Manage</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Other cards can be added here -->
+        </div>
+    </section>
+
+
+    <section id="Individual-pages" class="mb-5">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Admin menu</h5>
+                        <p class="card-text">Add, edit or delete admin menu.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('admin_menu') }}" class="btn btn-primary btn-sm">Manage</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Admin Gallery</h5>
+                        <p class="card-text">Add, edit or delete admin gallery page.</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('admin_gallery') }}" class="btn btn-primary btn-sm">Manage</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </section>
+</div>
+{% endblock content %}

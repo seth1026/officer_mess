@@ -1,0 +1,168 @@
+{% extends 'admin/layout.html' %}
+{% block title %}Manage Event Details{% endblock %}
+{% block content %}
+<style>
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #004085;
+    }
+
+    .btn-warning:hover {
+        background-color: #e0a800;
+        border-color: #d39e00;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+
+    .table th,
+    .table td {
+        vertical-align: middle;
+    }
+</style>
+
+<div class="container content my-5">
+    <h2 class="mb-4">Manage Event Details</h2>
+
+    <!-- Event Detail Form -->
+    <section class="card mb-5">
+        <div class="card-header">
+            <h5 class="card-title mb-0">{{ 'Edit Event Detail' if event else 'Add Event Detail' }}</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('manage_events') }}" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                {% if event %}
+                <input type="hidden" name="event_id" value="{{ event.id }}">
+                {% endif %}
+
+                <div class="mb-3">
+                    {{ form.title.label(class="form-label") }}
+                    {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else ""), value=event.title
+                    if event else '', required=True) }}
+                    {% for error in form.title.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.description.label(class="form-label") }}
+                    {{ form.description(class="form-control" + (" is-invalid" if form.description.errors else ""),
+                    value=event.description if event else '', rows=4, required=True) }}
+                    {% for error in form.description.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.date.label(class="form-label") }}
+                    {{ form.date(class="form-control" + (" is-invalid" if form.date.errors else ""),
+                    value=event.date.strftime('%Y-%m-%d') if event else '', required=True) }}
+                    {% for error in form.date.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.location.label(class="form-label") }}
+                    {{ form.location(class="form-control" + (" is-invalid" if form.location.errors else ""),
+                    value=event.location if event else '', required=True) }}
+                    {% for error in form.location.errors %}
+                    <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.photos.label(class="form-label") }}
+                    {{ form.photos(class="form-control", multiple="multiple") }}
+                    {% if event and event.photos %}
+                    <p>Current Photos:</p>
+                    <div class="row">
+                        {% for photo in event.photos %}
+                        <div class="col-md-3">
+                            <img src="{{ url_for('static', filename='uploads/' + photo.filename) }}"
+                                alt="{{ event.title }}" style="max-height: 100px; width: 100%; object-fit: cover;">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <button type="submit" name="{{ 'edit_event_submit' if event else 'event_submit' }}"
+                    class="btn btn-primary">{{ 'Update Event Detail' if event else 'Add Event Detail' }}</button>
+                {% if event %}
+                <a href="{{ url_for('manage_events') }}" class="btn btn-secondary">Cancel</a>
+                {% endif %}
+            </form>
+        </div>
+    </section>
+
+    <!-- Event Detail List -->
+    <section>
+        <h3 class="mb-3">Current Event Details</h3>
+        {% if events %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>Photos</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td>{{ event.title }}</td>
+                        <td>{{ event.description | truncate(100) }}</td>
+                        <td>{{ event.date.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ event.location }}</td>
+                        <td>
+                            {% if event.photos %}
+                            {{ event.photos | length }} photo(s)
+                            {% else %}
+                            No photos
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('manage_events', event_id=event.id) }}"
+                                class="btn btn-sm btn-warning me-2">Edit</a>
+                            <form action="{{ url_for('delete_event', id=event.id) }}" method="POST"
+                                style="display:inline;"
+                                onsubmit="return confirm('Are you sure you want to delete this event detail?');">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No event details available.</p>
+        {% endif %}
+    </section>
+    <a href="{{ url_for('adminDashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+    <a href="{{ url_for('manage_events', id=1 if events else 0) }}" class="btn btn-info mt-3 ms-2">View Public Page</a>
+</div>
+{% endblock %}

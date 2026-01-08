@@ -1,0 +1,88 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<div class="container-fluid mt-4 mb-5">
+    <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-header bg-gradient-primary text-white text-center py-4">
+            <h2 class="mb-1">
+                <i class="bi bi-calendar-event-fill me-2"></i>
+                Party Booking Calendar
+            </h2>
+            <p class="mb-0 opacity-90">Admin view • Click or hover on events for full details</p>
+        </div>
+
+        <div class="card-body p-4 bg-light">
+            <div id="calendar" class="rounded"></div>
+        </div>
+
+        <div class="card-footer bg-white text-center border-top-0 py-4">
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <span class="badge bg-info text-white px-3 py-2">Lunch</span>
+                <span class="badge bg-danger text-white px-3 py-2">Dinner</span>
+                <span class="badge bg-warning text-dark px-3 py-2">Breakfast</span>
+                <span class="badge bg-secondary text-white px-3 py-2">Other</span>
+            </div>
+            <div class="mt-4">
+                <a href="{{ url_for('adminDashboard') }}" class="btn btn-outline-secondary btn-lg">
+                    ← Back to Admin Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FullCalendar v6 + Bootstrap 5 Theme -->
+    <script src="{{ url_for('static', filename='fullcalendar-6.1.20/dist/index.global.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<style>
+    .fc-event {
+        border-radius: 8px;
+        padding: 4px 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .fc-event:hover {
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        height: 'auto',
+        themeSystem: 'bootstrap5',
+        events: {{ events | tojson }},
+        eventDidMount: function(info) {
+            // Bootstrap tooltip on hover
+            info.el.setAttribute('data-bs-toggle', 'tooltip');
+            info.el.setAttribute('data-bs-html', 'true');
+            info.el.setAttribute('data-bs-placement', 'top');
+            info.el.setAttribute('title', info.event.extendedProps.description);
+
+            new bootstrap.Tooltip(info.el, {
+                trigger: 'hover',
+                container: 'body'
+            });
+        },
+        eventClick: function(info) {
+            // Optional: Show in modal instead of alert (cleaner)
+            const desc = info.event.extendedProps.description.replace(/<br>/g, '\n').replace(/<[^>]*>/g, '');
+            alert('Party Booking Details:\n\n' + info.event.title + '\n\n' + desc);
+        }
+    });
+
+    calendar.render();
+});
+</script>
+{% endblock %}
