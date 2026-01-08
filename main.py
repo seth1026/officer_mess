@@ -348,6 +348,9 @@ def ensure_admin():
     admin_username = os.getenv("ADMIN_USERNAME")
     admin_password = os.getenv("ADMIN_PASSWORD")
 
+    print("ADMIN_USERNAME:", admin_username)
+    print("ADMIN_PASSWORD SET:", bool(admin_password))
+
     if not admin_username or not admin_password:
         print("Admin credentials not set")
         return
